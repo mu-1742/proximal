@@ -18,21 +18,23 @@ class ProxCIData:
 
     @property
     def Z(self):
-        # return np.hstack((unvec(self.S1), unvec(self.S2)))
-        return np.hstack(unvec(self.S1))
+        return self.S1
 
     @property
     def W(self):
-        # return np.hstack((unvec(self.S2), unvec(self.S3)))
-        return np.hstack(unvec(self.S3))
+        return self.S3
+
 
     @property
     def r1(self):
-        return np.hstack((unvec(self.Z), unvec(self.X), unvec(self.S2)))
+        # return np.hstack((unvec(self.W), unvec(self.X), unvec(self.S2)))
+        return np.hstack((self.W, self.X, self.S2))
 
     @property
     def r2(self):
-        return np.hstack((unvec(self.W), unvec(self.X), unvec(self.S2)))
+        # return np.hstack((unvec(self.Z), unvec(self.X), unvec(self.S2)))
+        return np.hstack((self.Z, self.X, self.S2))
+
 
     def create_crossfit_split(self, n_splits, cache=True):
         """split the dataset into n_split groups for cross-fitting"""

@@ -82,7 +82,7 @@ class ProximalInference:
         g1 = g1[cf_inds[fold]["train"]]
         g2 = g2[cf_inds[fold]["train"]]
 
-        data = join_data(r1, r2, g1, g2)
+        data = join_data(r2, r1, g1, g2)
         search = MinimaxRKHSCV(
             r1.shape[1],
             r2.shape[1],
