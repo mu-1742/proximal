@@ -1,11 +1,11 @@
 import os
+import torch
 import numpy as np
 import pandas as pd
 from proxci.proxci_dataset import ProxCIData
 from proxci.proximal_inference import ProximalInference
 import warnings
 warnings.filterwarnings("ignore")
-
 
 def generate_data_from_file(file_path):
     data = pd.read_csv(file_path, header=None)
@@ -18,7 +18,7 @@ def generate_data_from_file(file_path):
     return X, S2, S1, S3, Y, A
 
 
-def load_data(num_simulations=2, data_dir="tmp2"):
+def load_data(num_simulations=10, data_dir="tmp3"):
     observational_data = []
     experimental_data = []
     for i in range(1, num_simulations + 1):
@@ -30,12 +30,14 @@ def load_data(num_simulations=2, data_dir="tmp2"):
 
 
 if __name__ == "__main__":
-    observational_data, experimental_data = load_data(num_simulations=2)
+    observational_data, experimental_data = load_data(num_simulations=10)
 
-    obs_Y = [data[4] for data in observational_data]
-    exp_Y = [data[4] for data in experimental_data]
-    obs_Y_mean = np.mean(np.concatenate(obs_Y))
-    exp_Y_mean = np.mean(np.concatenate(exp_Y))
+    Y = np.concatenate([data[4] for data in experimental_data])
+    A = np.concatenate([data[5] for data in experimental_data])
+
+    mean_Y1 = Y[A == 1].mean()
+    mean_Y0 = Y[A == 0].mean()
+    tau_Y = mean_Y1 - mean_Y0
 
     proxci_dataset_obs = ProxCIData(*observational_data[0])
     proxci_dataset_exp = ProxCIData(*experimental_data[0])
@@ -56,11 +58,12 @@ if __name__ == "__main__":
     tau_SEL = proximal_inference.pipw(reduction=np.mean)
     tau_DR = proximal_inference.dr(reduction=np.mean)
 
+    mae_OTC = np.mean(np.abs(tau_Y - tau_OTC))
+    mae_DR = np.mean(np.abs(tau_Y - tau_DR))
 
-    print(f"obs_Y:{obs_Y_mean}")
-    print(f"exp_Y:{exp_Y_mean}")
-    print(f"OTC: {tau_OTC}")
-    print(f"SEL: {tau_SEL}")
-    print(f"DR: {tau_DR}")
+    print(f"tau_Y:{tau_Y}")
+    print(f"tau_OTC: {tau_OTC}, \nMAE_OTC: {mae_OTC}")
+    print(f"tau_SEL: {tau_SEL}")
+    print(f"tau_DR: {tau_DR}, \nMAE_DR: {mae_DR}")
 
 
